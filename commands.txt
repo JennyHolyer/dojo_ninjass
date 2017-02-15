@@ -1,0 +1,171 @@
+Dojo
+Have it include the name of the dojo and the city and state of each dojo
+Have the first dojo be "CodingDojo Silicon Valley" in "Mountain View", "CA".
+Have the second dojo be "CodingDojo Seattle" in "Seattle", "WA".
+Have the third dojo be "CodingDojo New York" in "New York", "NY".
+
+Ninja
+Have it include first_name, last_name of each ninja in the dojo.
+Each dojo can have multiple ninjas and each ninja belongs to a specific dojo.
+
+IMPORTANT INFO: When you do any of these assignments in this chapter, you should NEVER reference the foreign key. For example, Ninja.create(dojo_id: 5, ...) is BAD!  You should instead do something like this: Ninja.create(dojo: Dojo.first).  Always remember that if you're referencing a foreign key, you're doing something wrong!
+
+
+This is what you'll do:
+
+1. Start a new project (the name of the project should be 'dojo_ninjas')
+2. Create appropriate tables/models using "rails generate model", "rake db:create" and "rake db:migrate".
+3. Using Ruby console:
+        1. Create 3 dojos (insert some blank entries just to make sure it's allowing you to insert empty entries)
+4. Change your models so that it does the following validations:
+
+        1. For the dojo, require the presence of the name, city, and state; also require the state to be two characters long
+        2. For the ninja, require the presence of the first name and last name
+5. Make sure that your ninja model belongs to the dojo (specify this in the model for both the dojo and the ninja)
+6. Using ruby console:
+        1. Delete the three dojos you created (e.g. Dojo.find(1).destroy; also look up destroy_all method)
+        2. Create 3 additional dojos by using Dojo.new().
+        3. Try to create a few more dojos but without specifying some of the required fields. Make sure that the validation works and generates the errors.
+        4.Create 3 ninjas that belong to the first dojo you created.
+        5. Create 3 more ninjas and have them belong to the second dojo you created.
+        6. Create 3 more ninjas and have them belong to the third dojo you created.
+        7. Make sure you understand how to get all of the ninjas for any dojo (e.g. get all the ninjas for the first dojo, second dojo, etc).
+        8. How would you only retrieve the first_names of the ninjas that belong to the second dojo and order the result by created_at DESC order?
+        9. Delete the second dojo. How could you adjust your model so that it automatically removes all of the ninjas associated with that dojo?
+Make sure that you feel completely comfortable with using .all, .valid?, .where, .order, .limit, .save, .create, .errors, and other methods discussed in the video.
+
+*******************************************************************
+*********************** Here are the commands *********************
+*******************************************************************
+1. rails new dojo_ninjass
+2. add 'hirb' in Gemfile
+3. run bundle install
+4. rails g model Dojo name:string city:string state:string
+5. rake db:migrate
+6. rails g model Ninja first_name:string last_name:string dojo:references
+7. rake db:migrate
+
+
+in rails console:
+1. Hirb.enable
+2. Dojo.create(name: "CodingDojo Silicon Valley", city: "Mountain View", state: "CA")
+3.  2.3.3 :008 > Dojo.all
+      Dojo Load (0.3ms)  SELECT "dojos".* FROM "dojos"
+    +----+--------+--------+-------+--------+---------+
+    | id | name   | city   | state | cre... | upda... |
+    +----+--------+--------+-------+--------+---------+
+    | 1  | Cod... | Mou... | CA    | 201... | 2017... |
+    | 2  | Cod... | Sea... | WA    | 201... | 2017... |
+    | 3  | Cod... | New... | NY    | 201... | 2017... |
+    +----+--------+--------+-------+--------+---------+
+                3 rows in set
+4.  Ninja.create(first_name: "Tim", last_name: "Maina", dojo: Dojo.first)
+    2.3.3 :014 > Ninja.all
+    Ninja Load (0.1ms)  SELECT "ninjas".* FROM "ninjas"
+    +----+--------+--------+--------+--------+--------+
+    | id | fir... | las... | doj... | cre... | upd... |
+    +----+--------+--------+--------+--------+--------+
+    | 1  | Tim    | Maina  | 1      | 201... | 201... |
+    | 2  | Farrah | Hashmi | 2      | 201... | 201... |
+    +----+--------+--------+--------+--------+--------+
+    2 rows in set
+
+5. Ninja.first.dojo.name
+     Ninja Load (0.2ms)  SELECT  "ninjas".* FROM "ninjas" ORDER BY "ninjas"."id" ASC LIMIT ?  [["LIMIT", 1]]
+     Dojo Load (0.1ms)  SELECT  "dojos".* FROM "dojos" WHERE "dojos"."id" = ? LIMIT ?  [["id", 1], ["LIMIT", 1]]
+    => "CodingDojo Silicon Valley"
+
+6. Dojo.find(1).destroy
+      Dojo Load (0.2ms)  SELECT  "dojos".* FROM "dojos" WHERE "dojos"."id" = ? LIMIT ?  [["id", 1], ["LIMIT", 1]]
+       (0.1ms)  begin transaction
+      SQL (0.9ms)  DELETE FROM "dojos" WHERE "dojos"."id" = ?  [["id", 1]]
+       (1.0ms)  commit transaction
+    +----+--------+--------+-------+--------+---------+
+    | id | name   | city   | state | cre... | upda... |
+    +----+--------+--------+-------+--------+---------+
+    | 1  | Cod... | Mou... | CA    | 201... | 2017... |
+    +----+--------+--------+-------+--------+---------+
+    1 row in set
+    2.3.3 :022 > Dojo.all
+      Dojo Load (0.2ms)  SELECT "dojos".* FROM "dojos"
+    +----+--------+--------+-------+--------+---------+
+    | id | name   | city   | state | cre... | upda... |
+    +----+--------+--------+-------+--------+---------+
+    | 2  | Cod... | Sea... | WA    | 201... | 2017... |
+    | 3  | Cod... | New... | NY    | 201... | 2017... |
+    +----+--------+--------+-------+--------+---------+
+    2 rows in set
+
+    2.3.3 :033 > dojo1 = Dojo.new(name: "CodingDojo New York", city: "New York", state: "NY")
+    +----+--------+--------+-------+--------+---------+
+    | id | name   | city   | state | cre... | upda... |
+    +----+--------+--------+-------+--------+---------+
+    |    | Cod... | New... | NY    |        |         |
+    +----+--------+--------+-------+--------+---------+
+    1 row in set
+
+7.  2.3.3 :034 > dojo1.save
+       (0.3ms)  begin transaction
+      SQL (1.1ms)  INSERT INTO "dojos" ("name", "city", "state", "created_at", "updated_at") VALUES (?, ?, ?, ?, ?)  [["name", "CodingDojo New York"], ["city", "New York"], ["state", "NY"], ["created_at", 2017-02-13 02:46:43 UTC], ["updated_at", 2017-02-13 02:46:43 UTC]]
+       (1.0ms)  commit transaction
+     => true
+     2.3.3 :035 > Dojo.all
+      Dojo Load (0.2ms)  SELECT "dojos".* FROM "dojos"
+    +----+--------+--------+-------+--------+---------+
+    | id | name   | city   | state | cre... | upda... |
+    +----+--------+--------+-------+--------+---------+
+    | 4  | Cod... | Mou... | CA    | 201... | 2017... |
+    | 5  | Cod... | Sea... | WA    | 201... | 2017... |
+    | 6  | Cod... | New... | NY    | 201... | 2017... |
+    | 7  | Cod... | New... | NY    | 201... | 2017... |
+    +----+--------+--------+-------+--------+---------+
+            4 rows in set
+
+8. 2.3.3 :036 > Dojo.find(7).update(state: "CO")
+      Dojo Load (0.2ms)  SELECT  "dojos".* FROM "dojos" WHERE "dojos"."id" = ? LIMIT ?  [["id", 7], ["LIMIT", 1]]
+       (0.1ms)  begin transaction
+      SQL (1.3ms)  UPDATE "dojos" SET "state" = ?, "updated_at" = ? WHERE "dojos"."id" = ?  [["state", "CO"], ["updated_at", 2017-02-13 02:47:26 UTC], ["id", 7]]
+       (9.7ms)  commit transaction
+     => true
+    2.3.3 :037 > Dojo.all
+      Dojo Load (0.2ms)  SELECT "dojos".* FROM "dojos"
+    +----+--------+--------+-------+--------+---------+
+    | id | name   | city   | state | cre... | upda... |
+    +----+--------+--------+-------+--------+---------+
+    | 4  | Cod... | Mou... | CA    | 201... | 2017... |
+    | 5  | Cod... | Sea... | WA    | 201... | 2017... |
+    | 6  | Cod... | New... | NY    | 201... | 2017... |
+    | 7  | Cod... | New... | CO    | 201... | 2017... |
+    +----+--------+--------+-------+--------+---------+
+    4 rows in set
+
+8. errtest = Dojo.new
+    errtest[:name] = "Coding Dojo"
+    errtest.errors
+         => #<ActiveModel::Errors:0x007fa380108be8 @base=#<Dojo id: nil, name: "Coding Dojo", city: nil, state: nil, created_at: nil, updated_at: nil>, @messages={:city=>["can't be blank", "is too short (minimum is 2 characters)"], :state=>["can't be blank", "is too short (minimum is 2 characters)"]}, @details={:city=>[{:error=>:blank}, {:error=>:too_short, :count=>2}], :state=>[{:error=>:blank}, {:error=>:too_short, :count=>2}]}>
+    errtest.errors.messages
+         => {:city=>["can't be blank", "is too short (minimum is 2 characters)"], :state=>["can't be blank", "is too short (minimum is 2 characters)"]}
+
+9. 2.3.3 :069 > Ninja.find(3).dojo
+      Ninja Load (0.1ms)  SELECT  "ninjas".* FROM "ninjas" WHERE "ninjas"."id" = ? LIMIT ?  [["id", 3], ["LIMIT", 1]]
+      Dojo Load (0.1ms)  SELECT  "dojos".* FROM "dojos" WHERE "dojos"."id" = ? LIMIT ?  [["id", 7], ["LIMIT", 1]]
+    +----+--------+--------+-------+--------+---------+
+    | id | name   | city   | state | cre... | upda... |
+    +----+--------+--------+-------+--------+---------+
+    | 7  | Cod... | New... | CO    | 201... | 2017... |
+    +----+--------+--------+-------+--------+---------+
+                    1 row in set
+
+10. 2.3.3 :074 > Dojo.find(7).ninjas
+      Dojo Load (0.1ms)  SELECT  "dojos".* FROM "dojos" WHERE "dojos"."id" = ? LIMIT ?  [["id", 7], ["LIMIT", 1]]
+      Ninja Load (0.2ms)  SELECT "ninjas".* FROM "ninjas" WHERE "ninjas"."dojo_id" = ?  [["dojo_id", 7]]
+    +----+--------+--------+--------+--------+--------+
+    | id | fir... | las... | doj... | cre... | upd... |
+    +----+--------+--------+--------+--------+--------+
+    | 3  | Farrah | Hashmi | 7      | 201... | 201... |
+    +----+--------+--------+--------+--------+--------+
+                    1 row in set
+
+11. 2.3.3 :086 > Dojo.showNames
+      Dojo Load (0.1ms)  SELECT "dojos".* FROM "dojos"
+     => ["CodingDojo Silicon Valley", "CodingDojo Seattle", "CodingDojo New York", "CodingDojo New York"]
